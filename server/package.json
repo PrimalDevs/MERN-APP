@@ -1,0 +1,35 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "App server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrimalDevs/MERN-APP.git"
+  },
+  "author": "Cristian Marin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PrimalDevs/MERN-APP/issues"
+  },
+  "homepage": "https://github.com/PrimalDevs/MERN-APP#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parse": "^0.1.0",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jwt-simple": "^0.5.6",
+    "mongoose": "^5.10.7",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "cookie-parser": "^1.4.5",
+    "jsonwebtoken": "^8.5.1",
+    "nodemailer": "^6.4.11"
+  }
+}
