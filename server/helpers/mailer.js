@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
 // crea un objeto de transporte reutilizable usando SMTP
 let transporter = nodemailer.createTransport({

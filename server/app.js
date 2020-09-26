@@ -3,8 +3,8 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 require("dotenv").config();
-const indexRouter = require("./routes/index");
-const apiRouter = require("./routes/api");
+const indexRouter = require("./routers/index");
+const apiRouter = require("./routers/api");
 const apiResponse = require("./helpers/apiResponse");
 const cors = require("cors");
 
@@ -41,13 +41,13 @@ app.use(cors());
 // Prefijo de las routes y donde estan ubicadas
 app.use("/",indexRouter);
 app.use("/api",apiRouter);
+app.get('/ping',(req,res)=>res.send('pong'))
 
 // Error 404 si la url no existe
 app.all("*", function(req, res) {
     return apiResponse.notFoundResponse(res, "Pagina no encontrada");
 });
 
-app.get('/ping',(req,res)=>res.send('pong'))
 
 app.use((err, req, res)=>{
     if(err.name="UnauthorizedError"){
