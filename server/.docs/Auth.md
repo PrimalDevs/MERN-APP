@@ -1,4 +1,4 @@
-# Documentación API Auth
+# Documentación Auth 📥
 ## Register
 
 POST http://localhost:3000/api/auth/register
