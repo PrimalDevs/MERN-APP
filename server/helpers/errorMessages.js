@@ -11,9 +11,16 @@ exports.errorMessages = {
         noEspecificado:"El email debe ser especificado.",
         direccionInvalida: "El email debe ser una dirección valida de email.",
         enUso: "El email ya esta en uso",
+        noEncontrado:"El email especificado no fue encontrado",
     },
     password:{
         corta:"La contraseña debe tener mas de 6 caracteres.",
+    },
+    otp:{
+        noEspecificado:"El codigo OTP debe ser especificado.",
+        confirmar:"La cuenta ha sido confirmada exitosamente",
+        confirmado:"La cuenta ya estaba confirmada",
+        noCoincide:"El codigo OTP no coincide, compruebe su codigo."
     },
 
     account:{
