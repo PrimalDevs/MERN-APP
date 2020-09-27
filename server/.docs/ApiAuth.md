@@ -20,3 +20,12 @@ POST http://localhost:3000/api/auth/login
     "password":"123456789"
 }
 ```
+
+## Verify OTP
+POST http://localhost:3000/api/auth/verify-otp
+```json
+{
+    "email":"user1@gmail.com",
+    "otp":"ESTE-CODIGO-CAMBIA"
+}
+```

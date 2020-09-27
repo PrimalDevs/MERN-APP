@@ -13,6 +13,16 @@ const { errorMessages } = require("../helpers/errorMessages");
 
 
 
+/**
+ * Registro de User.
+ *
+ * @param {string}      firstName
+ * @param {string}      lastName
+ * @param {string}      email
+ * @param {string}      password
+ *
+ * @returns {Object}
+ */
 exports.register = [
 	// Validación de los parametros
 	body("firstName").isLength({ min: 1 }).trim().withMessage(errorMessages.firstName.noEspecificado)
@@ -94,6 +104,15 @@ exports.register = [
 }];
 
 
+
+/**
+ * User login.
+ *
+ * @param {string}      email
+ * @param {string}      password
+ *
+ * @returns {Object}
+ */
 exports.login=[
 	body("email").isLength({min:1}).trim().withMessage(errorMessages.email.noEspecificado)
 		.isEmail().withMessage(errorMessages.email.direccionInvalida),
@@ -138,7 +157,7 @@ exports.login=[
 											return apiResponse.unauthorizedResponse(res,errorMessages.account.inactiva,userData);
 										}
 									}else{
-										return apiResponse.unauthorizedResponse(res,errorMessages.account.noConfirmada,userData);
+										return apiResponse.unauthorizedResponse(res,errorMessages.account.noConfirmada);
 									}
 								}else{
 									return apiResponse.unauthorizedResponse(res,errorMessages.account.credencialesIncorrectas,userData);
@@ -155,3 +174,54 @@ exports.login=[
 		}
 	}
 ];
+
+
+/**
+ * Verifica el codigo otp.
+ *
+ * @param {string}      email
+ * @param {string}      otp
+ *
+ * @returns {Object}
+ */
+exports.verifyConfirm = [
+	body("email").isLength({ min: 1 }).trim().withMessage(errorMessages.email.noEspecificado)
+		.isEmail().withMessage(errorMessages.email.direccionInvalida),
+	body("otp").isLength({ min: 1 }).trim().withMessage(errorMessages.otp.noEspecificado),
+	
+	check("email").escape(),
+	check("otp").escape(),
+	
+	(req, res) => {
+		try {
+			const errors = validationResult(req);
+			if (!errors.isEmpty()) {
+				return apiResponse.validationErrorWithData(res, "Error de validacion.", errors.array());
+			}else {
+				var query = {email : req.body.email};
+				UserModel.findOne(query).then(user => {
+					if (user) {
+						if(!user.isConfirmed){
+							if(user.confirmOTP == req.body.otp){
+								UserModel.findOneAndUpdate(query, {
+									isConfirmed: 1,
+									confirmOTP: null 
+								}).catch(err => {
+									return apiResponse.ErrorResponse(res, err);
+								});
+								return apiResponse.successResponse(res,res,errorMessages.otp.confirmar);
+							}else{
+								return apiResponse.unauthorizedResponse(res,errorMessages.otp.noCoincide);
+							}
+						}else{
+							return apiResponse.unauthorizedResponse(res,errorMessages.otp.confirmado);
+						}
+					}else{
+						return apiResponse.unauthorizedResponse(res, errorMessages.email.noEncontrado);
+					}
+				});
+			}
+		} catch (err) {
+			return apiResponse.ErrorResponse(res, err);
+		}
+	}];
