@@ -11,29 +11,30 @@ const cors = require("cors");
 
 const MONGODB_URL = process.env.MONGODB_URL;
 const mongoose = require("mongoose");
-mongoose.connect(MONGODB_URL,{useNewUrlParser:true,useUnifiedTopology:true}).then(()=>{
-    if (process.env.NODE_ENV !=="test"){
-        console.log("Conectado a %s",MONGODB_URL);
-        console.log("App ajecutandose")
-    }
-}).catch(err=> {
-    console.error("La app se inicio con errores");
-    process.exit(1);
-});
+mongoose.connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+	if(process.env.NODE_ENV !== "test") {
+		console.log("BD -> %s", MONGODB_URL);
+		console.log("Aplicacion en ejecucion ... \n");
+		console.log("CTRL + C para detener el proceso. \n");
+	}
+})
+	.catch(err => {
+		console.error("La app se inicio con errores:", err.message);
+		process.exit(1);
+	});
 
 const db = mongoose.connection;
 
 const app = express();
 
 // Para ocultar logs cuando el env es test
-if(process.env.NODE_ENV!=="test"){
-    app.use(logger("dev"));
+if(process.env.NODE_ENV !== "test") {
+	app.use(logger("dev"));
 }
-
 app.use(express.json());
-app.use(express.urlencoded({extended:false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Permitir peticiones desde multiples origenes
 app.use(cors());
@@ -45,14 +46,13 @@ app.get('/ping',(req,res)=>res.send('pong'))
 
 // Error 404 si la url no existe
 app.all("*", function(req, res) {
-    return apiResponse.notFoundResponse(res, "Pagina no encontrada");
+	return apiResponse.notFoundResponse(res, "Page not found");
 });
 
-
-app.use((err, req, res)=>{
-    if(err.name="UnauthorizedError"){
-        return  apiResponse.unauthorizedResponse(res,err.message);
-    }
-})
+app.use((err, req, res) => {
+	if(err.name == "UnauthorizedError"){
+		return apiResponse.unauthorizedResponse(res, err.message);
+	}
+});
 
 module.exports = app;
