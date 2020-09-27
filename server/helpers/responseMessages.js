@@ -1,4 +1,5 @@
-exports.errorMessages = {
+exports.responseMessages = {
+    // User Model
     firstName:{
         noEspecificado:"El nombre debe ser especificado.",
         noAlfanumerico:"El nombre tiene caracteres no alfanumericos.",
@@ -17,12 +18,14 @@ exports.errorMessages = {
         corta:"La contraseña debe tener mas de 6 caracteres.",
     },
     otp:{
+        enviado:"Codigo de confirmacion enviado.",
+        confirmar:"La cuenta ha sido confirmada exitosamente.",
+        confirmado:"La cuenta ya estaba confirmada.",
+        noCoincide:"El codigo OTP no coincide, compruebe su codigo.",
         noEspecificado:"El codigo OTP debe ser especificado.",
-        confirmar:"La cuenta ha sido confirmada exitosamente",
-        confirmado:"La cuenta ya estaba confirmada",
-        noCoincide:"El codigo OTP no coincide, compruebe su codigo."
     },
 
+    // Auth Controller
     account:{
         inactiva:"Su cuenta esta inactiva, por favor contacte a un administrador.",
         noConfirmada:"Su cuenta no, esta confirmada, por favor confirme su cuenta.",
