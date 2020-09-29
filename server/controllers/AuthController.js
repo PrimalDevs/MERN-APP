@@ -3,11 +3,14 @@ const { body,validationResult } = require("express-validator");
 const { check } = require("express-validator");
 // Helpers para respuestas
 const apiResponse = require("../helpers/apiResponse");
+
 const utility = require("../helpers/utility");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mailer = require("../helpers/mailer");
 const { constants } = require("../helpers/constants");
+
+const {loginValidation,registerValidation,verifyConfirmValidation,resendConfirmOtpValidation} = require("../validation/auth");
 // Mensajes de error
 const { responseMessages } = require("../helpers/responseMessages");
 
@@ -24,23 +27,15 @@ const { responseMessages } = require("../helpers/responseMessages");
  * @returns {Object}
  */
 exports.register = [
-	// Validación de los parametros
-	body("firstName").isLength({ min: 1 }).trim().withMessage(responseMessages.firstName.noEspecificado)
-		.isAlphanumeric().withMessage(responseMessages.firstName.noAlfanumerico),
-	
-	body("lastName").isLength({ min: 1 }).trim().withMessage(responseMessages.lastName.noEspecificado)
-		.isAlphanumeric().withMessage(responseMessages.lastName.noAlfanumerico),
-
-	body("email").isLength({ min: 1 }).trim().withMessage(responseMessages.email.noEspecificado)
-		.isEmail().withMessage(responseMessages.email.direccionInvalida).custom((value) => {
+	body("email").isLength({ min: 1 }).trim().withMessage("Email must be specified.")
+		.isEmail().withMessage("Email must be a valid email address.").custom((value) => {
 			return UserModel.findOne({email : value}).then((user) => {
 				if (user) {
-					return Promise.reject(responseMessages.email.enUso);
+					return Promise.reject("E-mail already in use");
 				}
 			});
 		}),
-	body("password").isLength({ min: 6 }).trim().withMessage(responseMessages.password.corta),
-    
+   
     // Limpiar campos
 	check("firstName").escape(),
 	check("lastName").escape(),
@@ -50,11 +45,16 @@ exports.register = [
 	// Procesamiento de la petición despues de validar y limpiar los campos
 	(req, res) => {
 		try {
-			// EExtra los errores de validacion de la peticion
-			const errors = validationResult(req);
-			if (!errors.isEmpty()) {
-				// Muestra los mensajes de error
-				return apiResponse.validationErrorWithData(res, "Error de validacion.", errors.array());
+			const validar = registerValidation(req.body);
+			const validarEmail = validationResult(req);
+			// console.log(JSON.stringify(validarEmail))					;
+			
+			if((typeof validar.error !== 'undefined' && validar.error.details) || !validarEmail.isEmpty()) {
+				if(!validarEmail.isEmpty()){
+					return apiResponse.validationErrorWithData(res, "Error de validacion.", validarEmail.errors);
+				}else{
+					return apiResponse.validationErrorWithData(res, "Error de validacion.", validar.error.details);
+				}
 			}else {
 				//Encripta la contraseña
 				bcrypt.hash(req.body.password,10,function(err, hash) {
@@ -98,7 +98,6 @@ exports.register = [
 				});
 			}
 		} catch (err) {
-			// Retorna un JSON con status 500
 			return apiResponse.ErrorResponse(res, err);
 		}
 }];
@@ -114,19 +113,15 @@ exports.register = [
  * @returns {Object}
  */
 exports.login=[
-	body("email").isLength({min:1}).trim().withMessage(responseMessages.email.noEspecificado)
-		.isEmail().withMessage(responseMessages.email.direccionInvalida),
-
-	body("password").isLength({min:1}).trim().withMessage(responseMessages.password.noEspecificado),
 
 	check("email").escape(),
 	check("password").escape(),
 
 	(req,res)=>{
 		try {
-			const errors = validationResult(req);
-			if(!errors.isEmpty()){
-				return apiResponse.validationErrorWithData(res,"Error de validacion",errors.array());
+			const validar = loginValidation(req.body);
+			if(typeof validar.error !== 'undefined' && validar.error.details){
+				return apiResponse.validationErrorWithData(res, "Error de validacion.", validar.error.details);
 			}else {
 				UserModel.findOne({email : req.body.email}).then(user => {
 					if (user) {
@@ -185,18 +180,15 @@ exports.login=[
  * @returns {Object}
  */
 exports.verifyConfirm = [
-	body("email").isLength({ min: 1 }).trim().withMessage(responseMessages.email.noEspecificado)
-		.isEmail().withMessage(responseMessages.email.direccionInvalida),
-	body("otp").isLength({ min: 1 }).trim().withMessage(responseMessages.otp.noEspecificado),
 
 	check("email").escape(),
 	check("otp").escape(),
 
 	(req, res) => {
 		try {
-			const errors = validationResult(req);
-			if (!errors.isEmpty()) {
-				return apiResponse.validationErrorWithData(res, "Error de validacion.", errors.array());
+			const validar = verifyConfirmValidation(req.body);
+			if(typeof validar.error !== 'undefined' && validar.error.details){
+				return apiResponse.validationErrorWithData(res, "Error de validacion.", validar.error.details);
 			}else {
 				var query = {email : req.body.email};
 				UserModel.findOne(query).then(user => {
@@ -235,14 +227,12 @@ exports.verifyConfirm = [
  */
 
 exports.resendConfirmOtp=[
-	body("email").isLength({min:1}).trim().withMessage(responseMessages.email.noEspecificado)
-		.isEmail().withMessage(responseMessages.email.direccionInvalida),
 	check("email").escape(),
 	(req,res)=>{
 		try {
-			const errors=validationResult(req);
-			if (!errors.isEmpty()) {
-				return apiResponse.validationErrorWithData(res,"Error de validacion.",errors.array());
+			const validar = resendConfirmOtpValidation(req.body);
+			if(typeof validar.error !== 'undefined' && validar.error.details){
+				return apiResponse.validationErrorWithData(res, "Error de validacion.", validar.error.details);
 			} else {
 				var query={email:req.body.email};
 				UserModel.findOne(query).then(user=>{
