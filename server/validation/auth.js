@@ -45,4 +45,27 @@ const registerValidation = data =>{
     return schema.validate(data);
 };
 
+const loginValidation = data =>{
+  const schema=Joi.object({
+      email:Joi.string().required().trim().email().min(1).max(100)
+      .messages({
+          "string.base": `"email" debe de ser de tipo 'Email'.`,
+          "string.empty": `"email" no puede ser un campo vacio.`,
+          "string.min": `"email" debe de tener un largo minimo de {#limit}`,
+          "string.max": `"email" debe de tener un largo maximo de {#limit}`,
+          "any.required": `"email" es un campo requerido`
+        }),
+      password:Joi.string().required().trim().min(6).max(100)
+      .messages({
+          "string.base": `"password" debe de ser de tipo 'String'.`,
+          "string.empty": `"password" no puede ser un campo vacio.`,
+          "string.min": `"password" debe de tener un largo minimo de {#limit}`,
+          "string.max": `"password" debe de tener un largo maximo de {#limit}`,
+          "any.required": `"password" es un campo requerido`
+        })
+  });
+  return schema.validate(data);
+};
+
 module.exports.registerValidation=registerValidation;
+module.exports.loginValidation=loginValidation;

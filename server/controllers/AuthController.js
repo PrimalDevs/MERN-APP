@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken");
 const mailer = require("../helpers/mailer");
 const { constants } = require("../helpers/constants");
 
-const {registerValidation} = require("../validation/auth");
+const {loginValidation,registerValidation} = require("../validation/auth");
 // Mensajes de error
 const { responseMessages } = require("../helpers/responseMessages");
 
@@ -47,7 +47,7 @@ exports.register = [
 		try {
 			const validar = registerValidation(req.body);
 			const validarEmail = validationResult(req);
-			console.log(JSON.stringify(validarEmail))					;
+			// console.log(JSON.stringify(validarEmail))					;
 			
 			if((typeof validar.error !== 'undefined' && validar.error.details) || !validarEmail.isEmpty()) {
 				if(!validarEmail.isEmpty()){
@@ -113,19 +113,15 @@ exports.register = [
  * @returns {Object}
  */
 exports.login=[
-	body("email").isLength({min:1}).trim().withMessage(responseMessages.email.noEspecificado)
-		.isEmail().withMessage(responseMessages.email.direccionInvalida),
-
-	body("password").isLength({min:1}).trim().withMessage(responseMessages.password.noEspecificado),
 
 	check("email").escape(),
 	check("password").escape(),
 
 	(req,res)=>{
 		try {
-			const errors = validationResult(req);
-			if(!errors.isEmpty()){
-				return apiResponse.validationErrorWithData(res,"Error de validacion",errors.array());
+			const validar = loginValidation(req.body);
+			if(typeof validar.error !== 'undefined' && validar.error.details){
+				return apiResponse.validationErrorWithData(res, "Error de validacion.", validar.error.details);
 			}else {
 				UserModel.findOne({email : req.body.email}).then(user => {
 					if (user) {
