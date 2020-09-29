@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken");
 const mailer = require("../helpers/mailer");
 const { constants } = require("../helpers/constants");
 
-const {loginValidation,registerValidation,verifyConfirmValidation} = require("../validation/auth");
+const {loginValidation,registerValidation,verifyConfirmValidation,resendConfirmOtpValidation} = require("../validation/auth");
 // Mensajes de error
 const { responseMessages } = require("../helpers/responseMessages");
 
@@ -227,14 +227,12 @@ exports.verifyConfirm = [
  */
 
 exports.resendConfirmOtp=[
-	body("email").isLength({min:1}).trim().withMessage(responseMessages.email.noEspecificado)
-		.isEmail().withMessage(responseMessages.email.direccionInvalida),
 	check("email").escape(),
 	(req,res)=>{
 		try {
-			const errors=validationResult(req);
-			if (!errors.isEmpty()) {
-				return apiResponse.validationErrorWithData(res,"Error de validacion.",errors.array());
+			const validar = resendConfirmOtpValidation(req.body);
+			if(typeof validar.error !== 'undefined' && validar.error.details){
+				return apiResponse.validationErrorWithData(res, "Error de validacion.", validar.error.details);
 			} else {
 				var query={email:req.body.email};
 				UserModel.findOne(query).then(user=>{

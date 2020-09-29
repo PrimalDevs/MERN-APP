@@ -89,6 +89,21 @@ const verifyConfirmValidation = data =>{
   return schema.validate(data);
 };
 
+const resendConfirmOtpValidation = data =>{
+  const schema=Joi.object({
+      email:Joi.string().required().trim().email().min(1).max(100)
+      .messages({
+          "string.base": `"email" debe de ser de tipo 'Email'.`,
+          "string.empty": `"email" no puede ser un campo vacio.`,
+          "string.min": `"email" debe de tener un largo minimo de {#limit}`,
+          "string.max": `"email" debe de tener un largo maximo de {#limit}`,
+          "any.required": `"email" es un campo requerido`
+        })
+  });
+  return schema.validate(data);
+};
+
 module.exports.registerValidation=registerValidation;
 module.exports.loginValidation=loginValidation;
 module.exports.verifyConfirmValidation=verifyConfirmValidation;
+module.exports.resendConfirmOtpValidation=resendConfirmOtpValidation;
