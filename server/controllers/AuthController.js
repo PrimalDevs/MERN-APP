@@ -27,23 +27,15 @@ const { responseMessages } = require("../helpers/responseMessages");
  * @returns {Object}
  */
 exports.register = [
-	// Validación de los parametros
-	// body("firstName").isLength({ min: 1 }).trim().withMessage(responseMessages.firstName.noEspecificado)
-	// 	.isAlphanumeric().withMessage(responseMessages.firstName.noAlfanumerico),
-	
-	// body("lastName").isLength({ min: 1 }).trim().withMessage(responseMessages.lastName.noEspecificado)
-	// 	.isAlphanumeric().withMessage(responseMessages.lastName.noAlfanumerico),
-
-	// body("email").isLength({ min: 1 }).trim().withMessage(responseMessages.email.noEspecificado)
-	// 	.isEmail().withMessage(responseMessages.email.direccionInvalida).custom((value) => {
-	// 		return UserModel.findOne({email : value}).then((user) => {
-	// 			if (user) {
-	// 				return Promise.reject(responseMessages.email.enUso);
-	// 			}
-	// 		});
-	// 	}),
-	// body("password").isLength({ min: 6 }).trim().withMessage(responseMessages.password.corta),
-    
+	body("email").isLength({ min: 1 }).trim().withMessage("Email must be specified.")
+		.isEmail().withMessage("Email must be a valid email address.").custom((value) => {
+			return UserModel.findOne({email : value}).then((user) => {
+				if (user) {
+					return Promise.reject("E-mail already in use");
+				}
+			});
+		}),
+   
     // Limpiar campos
 	check("firstName").escape(),
 	check("lastName").escape(),
@@ -53,11 +45,16 @@ exports.register = [
 	// Procesamiento de la petición despues de validar y limpiar los campos
 	(req, res) => {
 		try {
-			// EExtra los errores de validacion de la peticion
-			const errors = registerValidation(req.body);
-			if (!errors.isEmpty()) {
-				// Muestra los mensajes de error
-				return apiResponse.validationErrorWithData(res, "Error de validacion.", errors.array());
+			const validar = registerValidation(req.body);
+			const validarEmail = validationResult(req);
+			console.log(JSON.stringify(validarEmail))					;
+			
+			if((typeof validar.error !== 'undefined' && validar.error.details) || !validarEmail.isEmpty()) {
+				if(!validarEmail.isEmpty()){
+					return apiResponse.validationErrorWithData(res, "Error de validacion.", validarEmail.errors);
+				}else{
+					return apiResponse.validationErrorWithData(res, "Error de validacion.", validar.error.details);
+				}
 			}else {
 				//Encripta la contraseña
 				bcrypt.hash(req.body.password,10,function(err, hash) {
@@ -101,7 +98,6 @@ exports.register = [
 				});
 			}
 		} catch (err) {
-			// Retorna un JSON con status 500
 			return apiResponse.ErrorResponse(res, err);
 		}
 }];
