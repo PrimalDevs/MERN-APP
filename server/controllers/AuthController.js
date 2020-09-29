@@ -3,11 +3,14 @@ const { body,validationResult } = require("express-validator");
 const { check } = require("express-validator");
 // Helpers para respuestas
 const apiResponse = require("../helpers/apiResponse");
+
 const utility = require("../helpers/utility");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mailer = require("../helpers/mailer");
 const { constants } = require("../helpers/constants");
+
+const {registerValidation} = require("../validation/auth");
 // Mensajes de error
 const { responseMessages } = require("../helpers/responseMessages");
 
@@ -25,21 +28,21 @@ const { responseMessages } = require("../helpers/responseMessages");
  */
 exports.register = [
 	// Validación de los parametros
-	body("firstName").isLength({ min: 1 }).trim().withMessage(responseMessages.firstName.noEspecificado)
-		.isAlphanumeric().withMessage(responseMessages.firstName.noAlfanumerico),
+	// body("firstName").isLength({ min: 1 }).trim().withMessage(responseMessages.firstName.noEspecificado)
+	// 	.isAlphanumeric().withMessage(responseMessages.firstName.noAlfanumerico),
 	
-	body("lastName").isLength({ min: 1 }).trim().withMessage(responseMessages.lastName.noEspecificado)
-		.isAlphanumeric().withMessage(responseMessages.lastName.noAlfanumerico),
+	// body("lastName").isLength({ min: 1 }).trim().withMessage(responseMessages.lastName.noEspecificado)
+	// 	.isAlphanumeric().withMessage(responseMessages.lastName.noAlfanumerico),
 
-	body("email").isLength({ min: 1 }).trim().withMessage(responseMessages.email.noEspecificado)
-		.isEmail().withMessage(responseMessages.email.direccionInvalida).custom((value) => {
-			return UserModel.findOne({email : value}).then((user) => {
-				if (user) {
-					return Promise.reject(responseMessages.email.enUso);
-				}
-			});
-		}),
-	body("password").isLength({ min: 6 }).trim().withMessage(responseMessages.password.corta),
+	// body("email").isLength({ min: 1 }).trim().withMessage(responseMessages.email.noEspecificado)
+	// 	.isEmail().withMessage(responseMessages.email.direccionInvalida).custom((value) => {
+	// 		return UserModel.findOne({email : value}).then((user) => {
+	// 			if (user) {
+	// 				return Promise.reject(responseMessages.email.enUso);
+	// 			}
+	// 		});
+	// 	}),
+	// body("password").isLength({ min: 6 }).trim().withMessage(responseMessages.password.corta),
     
     // Limpiar campos
 	check("firstName").escape(),
@@ -51,7 +54,7 @@ exports.register = [
 	(req, res) => {
 		try {
 			// EExtra los errores de validacion de la peticion
-			const errors = validationResult(req);
+			const errors = registerValidation(req.body);
 			if (!errors.isEmpty()) {
 				// Muestra los mensajes de error
 				return apiResponse.validationErrorWithData(res, "Error de validacion.", errors.array());
