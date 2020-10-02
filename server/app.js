@@ -11,6 +11,7 @@ const cors = require("cors");
 
 const MONGODB_URL = process.env.MONGODB_URL;
 const mongoose = require("mongoose");
+mongoose.set('useFindAndModify', false);
 mongoose.connect(MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
 	if(process.env.NODE_ENV !== "test") {
 		console.log("BD -> %s", MONGODB_URL);
