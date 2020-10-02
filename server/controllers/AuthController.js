@@ -155,12 +155,12 @@ exports.login=[
 										return apiResponse.unauthorizedResponse(res,responseMessages.account.noConfirmada);
 									}
 								}else{
-									return apiResponse.unauthorizedResponse(res,responseMessages.account.credencialesIncorrectas,userData);
+									return apiResponse.unauthorizedResponse(res,responseMessages.account.credencialesIncorrectas);
 								}
 							});
 						}else{
 							// Si el user no existe
-							return apiResponse.ErrorResponse(res,responseMessages.account.credencialesIncorrectas,userData);
+							return apiResponse.unauthorizedResponse(res,responseMessages.account.credencialesIncorrectas);
 						}
 					});
 			}
