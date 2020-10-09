@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
     return (
@@ -17,7 +18,7 @@ const Login = () => {
                 <div className="form-group">
                     <button className="btn btn-primary btn-block" type="submit">Log In</button>
                 </div>
-                {/* <a className="forgot" href="#">Forgot your email or password?</a> */}
+                <Link to="/forgot-password"className="forgot">Forgot your email or password?</Link>
             </form>
         </div>
     );
