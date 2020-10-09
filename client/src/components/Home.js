@@ -1,18 +1,18 @@
-import React from 'react';
-import Sidebar from './Sidebar';
-import Nav from './Nav';
-import Footer from './Footer';
+import React, {useState} from 'react';
+import Sidebar from './template/Sidebar';
+import Nav from './template/Nav';
+import Footer from './template/Footer';
+import ContentHome from './contents/ContentHome';
 
 const Home = () => {
+    const [toggleButton, setToggleButton] = useState('');
     return (
         <div className="App wrapper">
-            <Sidebar />
+            <Sidebar toggleButton={ toggleButton } />
             <div id="content">
-                <Nav />
-                <div className="content">
-                    <h3>Home</h3>
-                    <p>Home</p>
-                </div>
+                <Nav setToggleButton={ setToggleButton } toggleButton={ toggleButton } />
+                {/* Switch para saber que apartado cargar */}
+                <ContentHome />
                 <Footer />
             </div>
         </div>
