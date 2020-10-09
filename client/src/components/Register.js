@@ -25,7 +25,7 @@ const Register = () => {
                     <div className="form-group">
                         <button className="btn btn-primary btn-block" type="submit">Sign Up</button>
                     </div>
-                    <a className="already" href="#">You already have an account? Login here.</a>
+                    {/* <a className="already" href="#">You already have an account? Login here.</a> */}
                 </form>
             </div>
         </div>

@@ -17,7 +17,7 @@ const Login = () => {
                 <div className="form-group">
                     <button className="btn btn-primary btn-block" type="submit">Log In</button>
                 </div>
-                <a className="forgot" href="#">Forgot your email or password?</a>
+                {/* <a className="forgot" href="#">Forgot your email or password?</a> */}
             </form>
         </div>
     );

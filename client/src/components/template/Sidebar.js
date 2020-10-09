@@ -12,10 +12,10 @@ const Sidebar = ({toggleButton}) => {
             <ul className="list-unstyled components">
                 <p>Menu</p>
                 <li>
-                    <a href="#">Home</a>
+                    <Link to="/">Home</Link>
                 </li>
                 <li>
-                    <a href="#">Users</a>
+                    <Link to="/home/user">Users</Link>
                 </li>
             </ul>
         </nav>
