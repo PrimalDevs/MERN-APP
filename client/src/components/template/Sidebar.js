@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 const Sidebar = ({toggleButton}) => {
     // 
     return (
-        // className={`todo-item ${todo.completed ? "completed" : " "}`}>
         <nav id="sidebar" className={`sidebar ${toggleButton ? "active" : " "}`}>
             <div className="sidebar-header">
                 <h3>MERN-App</h3>
