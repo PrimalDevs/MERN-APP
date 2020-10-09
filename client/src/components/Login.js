@@ -1,19 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Login = () => {
 
     const userLogin = async (e) => {
         e.preventDefault();
-        console.log('Enviando');
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        console.log('Enviando = ' + email + ' - ' + password);
         login(email, password);
     }
 
     const login = async (email, password) => {
-        const rawResponse = await fetch('http://localhost:3001/api/auth/login', {
+        const response = await fetch('http://localhost:3001/api/auth/login', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -23,8 +22,20 @@ const Login = () => {
                 email: email, password: password
             })
         });
-        const content = await rawResponse.json();
-        console.log(content);
+        const data = await response.json();
+        console.log(data);
+        message(data.status, data.message);
+    }
+
+    const message = (status, text) => {
+        if(status === 0){
+            Swal.fire({
+                title: '¡Error!',
+                text: text,
+                icon: 'error',
+                confirmButtonText: 'Cool'
+            })
+        }
     }
 
     return (
