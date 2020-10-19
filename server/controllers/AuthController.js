@@ -70,31 +70,17 @@ exports.register = [
 							confirmOTP: otp
 						}
 					);
+					user.save(function (err) {
+						if (err) { return apiResponse.ErrorResponse(res, err); }
+						let userData = {
+							_id: user._id,
+							firstName: user.firstName,
+							lastName: user.lastName,
+							email: user.email,
+						};
+						return apiResponse.successResponseWithData(res,"Registro exitoso.", userData);
+					});
                     
-                    // Correo de verificacion de la cuenta
-					let html = "<p>Por favor verifique su cuenta.</p><p>OTP: "+otp+"</p>";
-					// Envia la notificacion
-					mailer.send(
-						constants.confirmEmails.from, 
-						req.body.email,
-						"Confirmar cuenta",
-						html
-					).then(function(){
-						// Guarda el usuario
-						user.save(function (err) {
-							if (err) { return apiResponse.ErrorResponse(res, err); }
-							let userData = {
-								_id: user._id,
-								firstName: user.firstName,
-								lastName: user.lastName,
-                                email: user.email,
-							};
-							return apiResponse.successResponseWithData(res,"Registro exitoso.", userData);
-						});
-					}).catch(err => {
-						console.log(err);
-						return apiResponse.ErrorResponse(res,err);
-					}) ;
 				});
 			}
 		} catch (err) {
@@ -239,20 +225,9 @@ exports.resendConfirmOtp=[
 					if(user){
 						if(!user.isConfirmed){
 							let otp = utility.randomNumber(4);
-							let html = "<p>Por favor verifique su cuenta</p><p>OTP: "+otp+"</p>";
-							mailer.send(
-								constants.confirmEmails.from,
-								req.body.email,
-								"Confirmar cuenta",
-								html
-							).then(function(){
-								user.isConfirmed=0;
-								user.confirmOTP=otp;
-
-								user.save(function(err){
-									if(err){return apiResponse.ErrorResponse(res,err);}
-									return apiResponse.successResponse(res,responseMessages.otp.enviado);
-								});
+							user.save(function(err){
+								if(err){return apiResponse.ErrorResponse(res,err);}
+								return apiResponse.successResponse(res,responseMessages.otp.enviado);
 							});
 						}else{
 							return apiResponse.unauthorizedResponse(res,responseMessages.otp.confirmado);
